@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 
 import User from '../models/user.model.js';
-import { loginValidation, userValidation } from '../validations/validation.service.js';
+import { signupValidation, loginValidation } from '../validations/validation.service.js';
 import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
 
 // @des    Register a new user
@@ -11,7 +11,7 @@ import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
 export const signup = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
-  const validationError = userValidation(req.body);
+  const validationError = signupValidation(req.body);
   if (validationError) {
     res.status(400);
     throw new Error(validationError);

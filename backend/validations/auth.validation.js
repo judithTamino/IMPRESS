@@ -1,6 +1,8 @@
 import Joi from 'joi';
 
-export const updateProfileSchema = Joi.object({
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,16}$/;
+
+export const signupSchema = Joi.object({
   firstName: Joi.string().min(2).required()
     .messages({
       'string.min': 'First name must be at least 2 characters long.',
@@ -19,16 +21,25 @@ export const updateProfileSchema = Joi.object({
       'string.empty': 'Email is required.'
     }),
 
-  password: Joi.string().pattern(passwordRegex)
+  password: Joi.string().pattern(passwordRegex).required()
+    .messages({
+      'string.pattern.base': 'Password must be 8-16 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*-).',
+      'string.empty': 'Password is required.'
+    }),
+    
+  role: Joi.string().allow('')
+});
+
+export const loginSchema = Joi.object({
+  email: Joi.string().email().required()
+    .messages({
+      'string.empty': 'Email is required.',
+      'string.email': 'Email must be a valid email address.',
+    }),
+
+  password: Joi.string().pattern(passwordRegex).required()
     .messages({
       'string.pattern.base': 'Password must be 8-16 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*-).',
       'string.empty': 'Password is required.'
     }),
 });
-
-
-
-
-
-
-
