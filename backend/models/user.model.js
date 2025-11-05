@@ -8,11 +8,11 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
   lastName: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
-  email: { type: String, required: true, trim: true, unique: true, match: RegExp(emailRegex) },
+  email: { type: String, required: true, trim: true, unique: true, index: true, match: RegExp(emailRegex) },
   password: { type: String, required: true, minLength: 8, maxLength: 16, match: RegExp(passwordRegex) },
   addresses: { type: [addressSchema], default: [] },
   role: { type: String, default: 'user' }
-});
+}, {timestamps: true});
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
