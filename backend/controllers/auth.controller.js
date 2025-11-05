@@ -13,15 +13,17 @@ export const signup = asyncHandler(async (req, res) => {
 
   const validationError = signupValidation(req.body);
   if (validationError) {
-    res.status(400);
-    throw new Error(validationError);
+    const error = new Error(validationError);
+    error.statusCode = 400;
+    throw error;
   }
 
   // Check if user exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    res.status(400);
-    throw new Error('Email already exist.')
+    const error = new Error('Email already exist.');
+    error.statusCode = 400;
+    throw error;
   }
 
   // Create admin
@@ -41,8 +43,9 @@ export const login = asyncHandler(async (req, res) => {
 
   const validationError = loginValidation(req.body);
   if (validationError) {
-    res.status(400);
-    throw new Error(validationError);
+    const error = new Error(validationError);
+    error.statusCode = 400;
+    throw error;
   }
 
   const user = await User.findOne({ email });
@@ -50,8 +53,10 @@ export const login = asyncHandler(async (req, res) => {
     const token = generateToken(user);
     res.status(200).json({ msg: `${user.firstName} ${user.lastName} logged-in successfully.`, token: token });
   } else {
-    res.status(401);
-    throw new Error('Invalid email or password');
+    const error = new Error('Invalid email or password.');
+    error.statusCode = 401;
+    throw error;
+
   }
 });
 

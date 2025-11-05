@@ -3,35 +3,38 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/user.model.js';
 import { JWT_SECRET } from '../config/env.js';
 
-export const protectRoute = asyncHandler(async (req, res, next) => {
+export const protectRoute = asyncHandler(async (req, _res, next) => {
   let token = req.headers.authorization;
 
   if (token && token.startsWith('Bearer'))
     token = token.split(' ')[1];
 
   if (!token) {
-    res.status = 401;
-    throw new Error('Please login.');
+    const error = new Error('Please login.');
+    error.statusCode = 401;
+    throw error;
   }
 
-  const decodedToken = jwt.verify(jwt, JWT_SECRET);
+  const decodedToken = jwt.verify(token, JWT_SECRET);
   const user = await User.findById(decodedToken._id);
 
   if (!user) {
-    res.status = 404;
-    throw new Error('User not found.');
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
   }
 
   req.user = user;
   next();
 });
 
-export const admin = (req, res, next) => {
+export const admin = (req, _res, next) => {
   const user = req.user;
 
   if (user && user.role === 'admin') next();
   else {
-    res.status = 401;
-    throw new Error('Unauthorized user.');
+    const error = new Error('Unauthorized user.');
+    error.statusCode = 401;
+    throw error;
   }
 }; 

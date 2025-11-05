@@ -1,4 +1,5 @@
-import {signupSchema, loginSchema} from './auth.validation.js';
+import { signupSchema, loginSchema } from './auth.validation.js';
+import { productSchema } from './product.validation.js';
 
 // AUTH
 export const signupValidation = user => {
@@ -9,6 +10,12 @@ export const signupValidation = user => {
 export const loginValidation = user => {
   const { error } = loginSchema.validate(user);
   if (error) return error.details.map(detail => detail.message);
+}
+
+// PRODUCT
+export const productValidation = product => {
+const {error} = productSchema.validate(product);
+if (error) return error.details.map(detail => detail.message);
 }
 
 // USER
