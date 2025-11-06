@@ -20,6 +20,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   if (existingProduct) {
     const error = new Error('Product already exists.');
     error.statusCode = 400;
+    throw error;
   }
 
   // Upload Images
@@ -36,16 +37,41 @@ export const createProduct = asyncHandler(async (req, res) => {
 });
 
 // @des    Get all products
-// @route  GET api/products
+// @route  GET api/products?filter?sortBy
 // @access public
 export const getAllProducts = asyncHandler(async (req, res) => {
+  const { shape, length, category, sortBy } = req.query;
+  const filter = {};
+  const sort = {};
 
+  if (shape) filter.shape = shape;
+  else if (category) filter.category = category;
+  else if (length) filter.length = length;
+
+  if (sortBy) {
+    const parts = sortBy.split(':');
+    sort[parts[0]] = parts[1] === 'dec' ? -1 : 1;
+  }
+
+  const products = await Product.find(filter).sort(sort).select('name images price');
+  res.status(200).json({ products: products });
 });
 
 // @des    Get product by id
 // @route  GET api/products/:id
 // @access public
-export const getProductInfo = asyncHandler(async (req, res) => { });
+export const getProductInfo = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+  if (!product) {
+    const error = new Error('Product not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  res.status(200).json({product: product});
+});
 
 // @des    Create product
 // @route  POST api/products

@@ -1,22 +1,19 @@
 const errorMiddleware = (err, _req, res, next) => {
   try {
-    const statusCode = err.statusCode ? err.statusCode : 500;
+    let error = { ...err };
+    error.message = err.message;
 
-    const errorTitles = {
-      400: "Bad Request",
-      401: "Unauthorized",
-      403: "Forbidden",
-      404: "Not Found",
-      500: "Server Error",
-    };
-
+    // Mongoose duplicate key
     if (err.code === 11000) {
-      const error = new Error("Duplicate field value entered");
+      error = new Error("Duplicate field value entered");
       error.statusCode = 400;
     }
 
-    res.status(statusCode).json({ title: errorTitles[statusCode] || "Unknown Error", msg: err.message, stack: err.stack });
-
+    res.status(error.statusCode || 500).json({
+      msg: error.message || 'Something went wrong',
+      stack: err.stack
+    });
+    
   } catch (error) {
     next(error);
   }
