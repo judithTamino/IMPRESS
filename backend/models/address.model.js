@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const phoneRegex = /^0(([23489]\d{7})|(5[0-9]{8}))$/;
 
-export const addressSchema = mongoose.Schema({
+export const Address = mongoose.Schema({
   fullName: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
   phone: { type: String, required: true, match: phoneRegex },
   street: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
