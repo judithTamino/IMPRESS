@@ -7,7 +7,7 @@ export const productSchema = Joi.object({
       'string.max': 'Name must be less than 50 characters long.',
       'string.required': 'Name is required.'
     }),
-  price: Joi.number().min(50).required()
+  price: Joi.number().min(0).required()
     .messages({
       'number.min': 'Price must be at least 50.',
       'number.required': 'Price is required.'
@@ -15,13 +15,19 @@ export const productSchema = Joi.object({
   images: Joi.array().items(Joi.string())
     .messages({
       'array.base': 'Images must be array of string.',
-      // 'array.required': 'Images is required.'
+      'array.required': 'Images is required.'
     }),
-  sizes: Joi.array().items(Joi.string()).required()
-    .messages({
-      'array.base': 'Sizes must be array of string.',
-      'array.required': 'Sizes is required.'
-    }),
+  sizes: Joi.array().items(Joi.object({
+    size: Joi.string().required().valid('XXS', 'XS', 'S', 'M', 'L')
+      .messages({
+        'string.required': 'Size is required.'
+      }),
+    stock: Joi.number().min(0).required()
+      .messages({
+        'number.min': 'Stock must be positive number.',
+        'number.required': 'Stock is required.'
+      })
+  })).required().min(1),
   shape: Joi.string().min(2).required().
     messages({
       'string.min': 'Shape must be at least 2 characters long.',
@@ -31,11 +37,6 @@ export const productSchema = Joi.object({
     messages({
       'string.min': 'Length must be at least 2 characters long.',
       'string.required': 'Length is required.'
-    }),
-  stock: Joi.number().min(0).required()
-    .messages({
-      'number.min': 'Stock must be positive number.',
-      'number.required': 'Stock is required.'
     }),
   category: Joi.string().min(2).required()
     .messages({
