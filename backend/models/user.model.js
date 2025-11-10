@@ -3,16 +3,44 @@ import bcrypt from 'bcryptjs';
 import { Address } from './address.model.js';
 
 const emailRegex = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,16}$/;
 
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
-  lastName: { type: String, required: true, lowercase: true, minLength: 2, trim: true },
-  email: { type: String, required: true, trim: true, unique: true, index: true, match: RegExp(emailRegex) },
-  password: { type: String, required: true, minLength: 8, maxLength: 16, match: RegExp(passwordRegex) },
-  addresses: { type: [Address], default: [] },
-  role: { type: String, default: 'user' }
-}, {timestamps: true});
+  firstName: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+    unique: true,
+    match: RegExp(emailRegex)
+  },
+  password: {
+    type: String,
+    required: true,
+    match: RegExp(passwordRegex)
+  },
+  addresses: {
+    type: [Address],
+    default: []
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  }
+}, { timestamps: true });
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {

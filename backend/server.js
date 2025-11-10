@@ -14,21 +14,17 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 app.use('/uploads', express.static('uploads'));
-
-// Database connection
-connectToDB();
 
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
-
 
 // Error middleware
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(chalk.bgGreenBright(`Server is running on http://localhost:${PORT}`));
+  connectToDB();
 });

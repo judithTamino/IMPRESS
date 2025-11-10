@@ -5,9 +5,9 @@ import { MONGODB_URI } from './env.js';
 const connectToDB = async () => {
   try {
     await mongoose.connect(`${MONGODB_URI}/IMPRESS`);
-    console.log(chalk.bgGreenBright('MongoDB connected successfully'));   
+    console.log(chalk.bgGreenBright('MongoDB connected successfully'));
   } catch (error) {
-    console.log(chalk.bgRedBright("MongoDB connection error: ", error));
+    console.log(chalk.bgRedBright("MongoDB connection error: ", error.message));
     process.exit(1);
   }
 };
