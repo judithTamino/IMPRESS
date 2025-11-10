@@ -9,7 +9,7 @@ export const productSchema = Joi.object({
     }),
   price: Joi.number().min(0).required()
     .messages({
-      'number.min': 'Price must be at least 50.',
+      'number.min': 'Price must be positive number.',
       'number.required': 'Price is required.'
     }),
   images: Joi.array().items(Joi.string())
