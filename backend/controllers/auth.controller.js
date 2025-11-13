@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 
 import User from '../models/user.model.js';
-import { signupValidation, loginValidation } from '../validations/validation.service.js';
 import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
 
 // @des    Register a new user
@@ -10,13 +9,6 @@ import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
 // @access public
 export const signup = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-
-  const validationError = signupValidation(req.body);
-  if (validationError) {
-    const error = new Error(validationError);
-    error.statusCode = 400;
-    throw error;
-  }
 
   // Check if user exists
   const existingUser = await User.findOne({ email });
@@ -41,12 +33,6 @@ export const signup = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const validationError = loginValidation(req.body);
-  if (validationError) {
-    const error = new Error(validationError);
-    error.statusCode = 400;
-    throw error;
-  }
 
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {

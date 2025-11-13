@@ -1,7 +1,7 @@
 import express from 'express';
 import chalk from 'chalk';
 
-import errorMiddleware from './middlewares/error.middleware.js';
+import errorHandler from './middlewares/error.middleware.js';
 import logger from './middlewares/logger.middleware.js';
 
 import authRouter from './routes/auth.route.js';
@@ -22,7 +22,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
 
 // Error middleware
-app.use(errorMiddleware);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(chalk.bgGreenBright(`Server is running on http://localhost:${PORT}`));
