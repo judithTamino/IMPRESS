@@ -1,4 +1,6 @@
-const Item = new mongoose.Schema({
+import mongoose from 'mongoose';
+
+const Item = mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',

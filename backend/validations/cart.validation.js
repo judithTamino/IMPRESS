@@ -7,7 +7,7 @@ const itemSchema = Joi.object({
       'number.required': 'Quantity is required.',
       'number.min': 'Quantity must be at least 1.'
     }),
-  size: Joi.string().required().valid('XXS', 'XS', 'S', 'M', 'L')
+  size: Joi.string().required().valid('xxs', 'xs', 's', 'm', 'l')
     .messages({
       'string.base': 'Size must be a string.',
       'string.required': 'Size is required.',
