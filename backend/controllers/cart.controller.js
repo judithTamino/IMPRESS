@@ -5,7 +5,7 @@ import Cart from '../models/cart.model.js';
 // @des    Add item to cart
 // @route  POST api/cart/:id
 // @access private
-export const addItemToCart = asyncHandler(async (req, res) => {
+export const addToCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const productId = req.params.id;
   const { quantity, size } = req.body.items[0];
@@ -20,10 +20,9 @@ export const addItemToCart = asyncHandler(async (req, res) => {
   let cart = await Cart.findOne({ user: userId });
   if (!cart) cart = new Cart({ user: userId, items: [] });
 
-  const areThereProducts = cart.items.find(item => item.product.toString() === productId && item.size === size
-  );
+  const exsistingProduct = cart.findCartItem(productId, size);
 
-  if (areThereProducts) areThereProducts.quantity += quantity;
+  if (exsistingProduct) exsistingProduct.quantity = quantity;
   else
     cart.items.push({
       product: productId,
@@ -35,19 +34,47 @@ export const addItemToCart = asyncHandler(async (req, res) => {
     })
 
 
-  cart.totalPrice = cart.items.reduce((accumulator, item) => accumulator + item.price * item.quantity, 0);
+  cart.totalPrice = cart.calculateTotal();
 
   await cart.save();
   res.status(201).json({ msg: `${product.name} added to cart.`, cart: cart });
 });
 
 // @des    Get all items in cart
-// @route  GET api/cart/
+// @route  GET api/cart
 // @access private
-export const getAllItems = asyncHandler(async (req, res) => { });
+export const getAllItems = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const cart = await Cart.findOne({user: userId }).select('items totalPrice');
+  if(!cart) {
+    const error = new Error('Cart empty.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  res.status(200).json({cart: cart});
+});
 
 // @des    delete item from cart
-// @route  DELETE api/cart/:id
+// @route  DELETE api/cart
 // @access private
-export const removeItemFromCart = asyncHandler(async (req, res) => { });
+export const removeAllFromCart = asyncHandler(async (req, res) => {
+  const { productId, size } = req.body;
+  const userId = req.user.id;
+
+  const cart = await Cart.findOne({ user: userId }).select('items totalPrice');
+  if (!cart) {
+    const error = new Error('Cart empty.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  cart.items = cart.items.filter(
+    item => !(item.product.toString() === productId && item.size === size));
+  cart.totalPrice = cart.calculateTotal();
+  await cart.save();
+
+  res.status(200).json({msg: 'Product remove.', cart: cart});
+});
 
