@@ -2,10 +2,10 @@ import asyncHandler from 'express-async-handler';
 import Product from '../models/product.model.js';
 import fs from 'fs';
 
-// @des    Create product
+// @des    Add product
 // @route  POST api/products
 // @access admin
-export const createProduct = asyncHandler(async (req, res) => {
+export const addProduct = asyncHandler(async (req, res) => {
   const { name } = req.body;
 
   const existingProduct = await Product.findOne({ name });

@@ -17,8 +17,9 @@ const cartSchema = mongoose.Schema({
   },
 }, { timestamps: true });
 
-cartSchema.methods.findCartItem = function(productId, size) {
-  return this.items.find(item => item.product.toString() === productId && item.size === size);
+cartSchema.methods.removeProductFromCart = function(productId, size) {
+  return this.items.filter(
+    item => !(item.product.toString() === productId && item.size === size));
 };
 
 cartSchema.methods.calculateTotal = function() {
