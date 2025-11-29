@@ -2,7 +2,7 @@ import express from 'express';
 import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
 
-import errorHandler from './middlewares/error.middleware.js';
+import {errorHandler, notFound} from './middlewares/error.middleware.js';
 import logger from './middlewares/logger.middleware.js';
 
 import authRouter from './routes/auth.route.js';
@@ -29,6 +29,7 @@ app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
 
 // Error middleware
+app.use(notFound);
 app.use(errorHandler);
 
 app.listen(port, () => {

@@ -4,19 +4,23 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/user.model.js';
 import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
 
+import apiError from '../utils/error.utils.js';
+
 // @des    Register a new user
 // @route  POST api/auth/signup
 // @access public
-export const signup = asyncHandler(async (req, res) => {
+export const signup = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
   // Check if user exists
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    const error = new Error('Email already exist.');
-    error.statusCode = 400;
-    throw error;
-  }
+  if (existingUser)
+    throw new apiError(400, 'Email already exist.')
+  //    {
+  //   const error = new Error('Email already exist.');
+  //   error.statusCode = 400;
+  //   next(error);
+  // }
 
   // Create admin
   let role = 'user';
@@ -30,7 +34,7 @@ export const signup = asyncHandler(async (req, res) => {
 // @des    Login user
 // @route  POST api/auth/login
 // @access public
-export const login = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
 
@@ -41,8 +45,7 @@ export const login = asyncHandler(async (req, res) => {
   } else {
     const error = new Error('Invalid email or password.');
     error.statusCode = 401;
-    throw error;
-
+    next(error);
   }
 });
 
