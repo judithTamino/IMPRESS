@@ -2,6 +2,46 @@ import asyncHandler from 'express-async-handler';
 import Product from '../models/product.model.js';
 import Cart from '../models/cart.model.js';
 
+// @des    Get all items in cart
+// @route  GET api/cart
+// @access private
+export const getCartProducts = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+ 
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    const error = new Error('Cart empty.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  for (const item of cart.items) {
+    const product = await Product.findById(item.product);
+
+    if (!product || product.isDeleted) {
+      updatedCartItems.push({ ...item.toObject(), isDeleted: true, msg: 'Discontinued' });
+      continue;
+    }
+
+    const productSize = product.sizes.find(s => s.size === item.size);
+    const isOutOfStock = !productSize || productSize.stock === 0;
+  
+    updatedCartItems.push({
+      ...item.toObject(),
+      name: product.name,
+      image: product.images[0],
+      price: product.price,
+      oldPrice: item.price !== product.price ? item.price : null,
+      outOfStock: isOutOfStock ? 'Out of stock' : null
+    });
+  }
+
+  const totalPrice = updatedCartItems.reduce((accumulator, item) => item.isOutOfStock ? accumulator : accumulator + item.price * item.quantity, 0);
+
+
+  // res.status(200).json({ items: updatedCartItems, totalPrice: totalPrice });
+});
+
 // @des    Add item to cart
 // @route  POST api/cart/:id
 // @access private
@@ -47,46 +87,6 @@ export const addToCart = asyncHandler(async (req, res) => {
   // res.status(201).json({ msg: `${product.name} added to cart.`, cart: cart });
 });
 
-// @des    Get all items in cart
-// @route  GET api/cart
-// @access private
-export const getCartProducts = asyncHandler(async (req, res) => {
-  // const userId = req.user.id;
-  // const updatedCartItems = [];
-
-  // const cart = await Cart.findOne({ user: userId });
-  // if (!cart) {
-  //   const error = new Error('Cart empty.');
-  //   error.statusCode = 404;
-  //   throw error;
-  // }
-
-  // for (const item of cart.items) {
-  //   const product = await Product.findById(item.product);
-
-  //   if (!product || product.isDeleted) {
-  //     updatedCartItems.push({ ...item.toObject(), isDeleted: true, msg: 'Discontinued' });
-  //     continue;
-  //   }
-
-  //   const productSize = product.sizes.find(s => s.size === item.size);
-  //   const isOutOfStock = !productSize || productSize.stock === 0;
-  
-  //   updatedCartItems.push({
-  //     ...item.toObject(),
-  //     name: product.name,
-  //     image: product.images[0],
-  //     price: product.price,
-  //     oldPrice: item.price !== product.price ? item.price : null,
-  //     outOfStock: isOutOfStock ? 'Out of stock' : null
-  //   });
-  // }
-
-  // const totalPrice = updatedCartItems.reduce((accumulator, item) => item.isOutOfStock ? accumulator : accumulator + item.price * item.quantity, 0);
-
-
-  // res.status(200).json({ items: updatedCartItems, totalPrice: totalPrice });
-});
 
 // @des    delete item from cart
 // @route  DELETE api/cart
