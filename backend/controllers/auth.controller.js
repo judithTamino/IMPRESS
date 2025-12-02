@@ -1,53 +1,64 @@
-import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
-
-import User from '../models/user.model.js';
-import { ADMIN_EMAIL, JWT_SECRET } from '../config/env.js';
-
-import apiError from '../utils/error.utils.js';
+import * as authService from '../services/auth.service.js';
+import { setAuthCookie, clearAuthCookie } from '../utils/token.utils.js';
 
 // @des    Register a new user
 // @route  POST api/auth/signup
 // @access public
-export const signup = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password } = req.body;
+export const signup = asyncHandler(async (req, res) => {
+  const { user, token } = await authService.signup(req.body);
+  setAuthCookie(res, token);
 
-  // Check if user exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser)
-    throw new apiError(400, 'Email already exist.')
-  //    {
-  //   const error = new Error('Email already exist.');
-  //   error.statusCode = 400;
-  //   next(error);
-  // }
-
-  // Create admin
-  let role = 'user';
-  if (email === ADMIN_EMAIL) role = 'admin';
-
-  // Create new user
-  await User.create({ firstName, lastName, email, password, role });
-  res.status(201).json({ msg: 'User created successfully' });
+  res.status(201).json({
+    success: true,
+    message: 'Sign Up',
+    user
+  });
 });
 
 // @des    Login user
 // @route  POST api/auth/login
 // @access public
-export const login = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
+export const login = asyncHandler(async (req, res) => {
+  const token = await authService.login(req.body);
+  setAuthCookie(res, token);
 
-
-  const user = await User.findOne({ email });
-  if (user && (await user.matchPassword(password))) {
-    const token = generateToken(user);
-    res.status(200).json({ msg: `${user.firstName} ${user.lastName} logged-in successfully.`, token: token });
-  } else {
-    const error = new Error('Invalid email or password.');
-    error.statusCode = 401;
-    next(error);
-  }
+  res.status(200).json({
+    success: true,
+    message: 'Logged In',
+    token
+  });
 });
 
-// generate JWT Token
-const generateToken = user => jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+// @des    Logout user
+// @route  POST api/auth/logout
+// @access public
+export const logout = asyncHandler(async (req, res) => {
+  clearAuthCookie(res);
+  res.status(200).json({
+    success: true,
+    message: 'Logged Out',
+  });
+});
+
+// @des    Send Reset Password OTP to Email
+// @route  POST api/auth/send-reset-password-otp
+// @access public
+export const sendResetPasswordOTP = asyncHandler(async (req, res) => {
+  await authService.sendResetPasswordOTP(req.body.email);
+  res.status(200).json({
+    success: true,
+    message: 'OTP sent to your email.',
+  });
+});
+
+// @des    Reset Password
+// @route  POST api/auth/reset-password
+// @access private
+export const resetPassword = asyncHandler(async (req, res) => {
+  await authService.resetPassword(req.body);
+  res.status(200).json({
+    success: true,
+    message: 'Your password has been reset successfully.',
+  })
+});

@@ -2,15 +2,16 @@ import Joi from 'joi';
 import { ENV } from '../config/env.js';
 
 export const errorHandler = (error, _req, res, next) => {
+  console.log(error.statusCode)
 
-  const statusCode = error.statusCode || 500;
+  let statusCode = error.statusCode || 500;
   const isDev = ENV === 'development';
 
   const response = {
     success: false,
     status: statusCode,
     message: error.message || 'Something went wrong',
-    errors: null,
+    errors: [],
     ...(isDev && { stack: error.stack })
   }
 
@@ -27,16 +28,8 @@ export const errorHandler = (error, _req, res, next) => {
   }
 
   // MONGOOSE DUPLICATE KEY ERROR
-  if (error.code === 1100) {
-    response.status = 400;
-    response.message = 'Duplicate field value.';
-    response.errors = Object.keys(error.keyValue).map(field => ({
-      field,
-      msg: `Duplicate value for field '${field}`
-    }));
-
-    return res.status(400).json(response);
-  }
+  console.log(error.code)
+  if (error.code === 11000) statusCode = 400;
 
   // CUSTOM API ERROR
   if (error.statusCode)
@@ -46,8 +39,8 @@ export const errorHandler = (error, _req, res, next) => {
   return res.status(statusCode).json(response);
 };
 
-export const notFound = (_req, _res, next) => {
-  const error = new Error('Not Found');
-  error.statusCode = 404;
-  next(error);
-}
+// export const notFound = (_req, _res, next) => {
+//   const error = new Error('Not Found');
+//   error.statusCode = 404;
+//   next(error);
+// }

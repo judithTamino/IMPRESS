@@ -1,40 +1,31 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
+
 import User from '../models/user.model.js';
 import { JWT_SECRET } from '../config/env.js';
+import { CustomError } from '../utils/error.utils.js';
 
 export const protectRoute = asyncHandler(async (req, _res, next) => {
-  let token = req.headers.authorization;
+  const { token } = req.cookies;
 
-  if (token && token.startsWith('Bearer'))
-    token = token.split(' ')[1];
-
-  if (!token) {
-    const error = new Error('Please login.');
-    error.statusCode = 401;
-    throw error;
-  }
+  if (!token)
+    throw new CustomError('Access denied: Missing or invalid token.', 401);
 
   const decodedToken = jwt.verify(token, JWT_SECRET);
   const user = await User.findById(decodedToken._id);
 
-  if (!user) {
-    const error = new Error('User not found.');
-    error.statusCode = 404;
-    throw error;
-  }
+  if (!user)
+    throw new CustomError('User not found.', 404);
 
   req.user = user;
   next();
 });
 
-export const admin = (req, _res, next) => {
+export const adminRoute = (req, _res, next) => {
   const user = req.user;
 
-  if (user && user.role === 'admin') next();
-  else {
-    const error = new Error('Unauthorized user.');
-    error.statusCode = 401;
-    throw error;
-  }
+  if (user && user.role === 'admin')
+    next();
+  else
+    throw new CustomError('Access denied: Admin only.', 401);
 }; 
