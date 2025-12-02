@@ -9,11 +9,11 @@ import { productSchema } from '../validations/product.validation.js';
 
 const productRouter = Router();
 
-productRouter.post('/', validate(productSchema), protectRoute, adminRoute, upload.array('images'), addProduct);
+productRouter.post('/', validate(productSchema), upload.array('images'), protectRoute, adminRoute, addProduct);
 productRouter.get('/', getAllActiveProducts);
 productRouter.get('/all', protectRoute, adminRoute, getAllProducts);
 productRouter.get('/:id', getProductInfo);
-productRouter.put('/:id', validate(productSchema), protectRoute, adminRoute, upload.array('images'), updateProduct);
+productRouter.put('/:id', validate(productSchema), protectRoute, adminRoute, updateProduct);
 productRouter.patch('/:id', protectRoute, adminRoute, deletepProduct);
 
 export default productRouter;

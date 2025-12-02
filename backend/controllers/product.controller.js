@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler';
+import * as productService from '../services/product.service.js';
 import Product from '../models/product.model.js';
 import fs from 'fs';
 
@@ -6,26 +7,13 @@ import fs from 'fs';
 // @route  POST api/products
 // @access admin
 export const addProduct = asyncHandler(async (req, res) => {
-  const { name } = req.body;
+  const product = await productService.addProduct(req.body, req.files);
 
-  const existingProduct = await Product.findOne({ name });
-  if (existingProduct) {
-    const error = new Error('Product already exists.');
-    error.statusCode = 400;
-    throw error;
-  }
-
-  // Upload Images
-  const images = [];
-  if (req.files && req.files.length > 0)
-    req.files.forEach(file => {
-      const imageName = `${Date.now()}-${file.originalname}`;
-      fs.writeFileSync(`uploads/${imageName}`, file.buffer);
-      images.push(`${req.protocol}://${req.get('host')}/uploads/${imageName}`)
-    });
-
-  await Product.create({ ...req.body, images: images });
-  res.status(201).json({ msg: 'Product create successfully' });
+  res.status(201).json({
+    success: true,
+    message: 'Product Added.',
+    product
+  });
 });
 
 // @des    Get all active products
@@ -45,7 +33,7 @@ export const getAllActiveProducts = asyncHandler(async (req, res) => {
     sort[parts[0]] = parts[1] === 'dec' ? -1 : 1;
   }
 
-  const products = await Product.find({...filter, isDeleted: false}).sort(sort).select('name images price');
+  const products = await Product.find({ ...filter, isDeleted: false }).sort(sort).select('name images price');
   res.status(200).json({ products: products });
 });
 

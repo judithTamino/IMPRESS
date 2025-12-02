@@ -12,6 +12,7 @@ export const protectRoute = asyncHandler(async (req, _res, next) => {
     throw new CustomError('Access denied: Missing or invalid token.', 401);
 
   const decodedToken = jwt.verify(token, JWT_SECRET);
+
   const user = await User.findById(decodedToken._id);
 
   if (!user)

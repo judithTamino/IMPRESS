@@ -34,6 +34,7 @@ const productSchema = new mongoose.Schema({
   images: {
     type: [String],
     required: true,
+    validate: imgs => imgs.length > 0
   },
   sizes: {
     type: [sizeSchema],
@@ -42,7 +43,8 @@ const productSchema = new mongoose.Schema({
   shape: {
     type: String,
     required: true,
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   length: {
     type: String,
@@ -57,11 +59,14 @@ const productSchema = new mongoose.Schema({
   },
   collectionName: {
     type: String,
-    required: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    default: ''
   },
-  isDeleted: { type: Boolean, default: false }
+  isDeleted: { 
+    type: Boolean, 
+    default: false 
+  }
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

@@ -40,7 +40,7 @@ export const login = async (userData) => {
   if (!user || !(await user.matchPassword(password)))
     throw new CustomError('Invalid email or password.', 401);
 
-  return generateToken(userData);
+  return generateToken(user);
 }
 
 export const sendResetPasswordOTP = async (email) => {
