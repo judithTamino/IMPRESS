@@ -63,11 +63,22 @@ const productSchema = new mongoose.Schema({
     trim: true,
     default: ''
   },
-  isDeleted: { 
-    type: Boolean, 
-    default: false 
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
+
+productSchema.index({ shape: 1 });
+productSchema.index({ length: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ collectionName: 1 });
+
+productSchema.index({ createdAt: -1 });
+productSchema.index({ price: 1 });
+
+productSchema.index({ "sizes.size": 1 });
+productSchema.index({ "sizes.stock": 1 });
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;

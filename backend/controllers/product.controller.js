@@ -16,26 +16,6 @@ export const addProduct = asyncHandler(async (req, res) => {
   });
 });
 
-// @des    Get all active products
-// @route  GET api/products?filter?sortBy
-// @access public
-export const getAllActiveProducts = asyncHandler(async (req, res) => {
-  const { shape, length, category, sortBy } = req.query;
-  const filter = {};
-  const sort = {};
-
-  if (shape) filter.shape = shape;
-  else if (category) filter.category = category;
-  else if (length) filter.length = length;
-
-  if (sortBy) {
-    const parts = sortBy.split(':');
-    sort[parts[0]] = parts[1] === 'dec' ? -1 : 1;
-  }
-
-  const products = await Product.find({ ...filter, isDeleted: false }).sort(sort).select('name images price');
-  res.status(200).json({ products: products });
-});
 
 // @des    Get all products
 // @route  GET api/products/all?filter?sortBy
