@@ -12,7 +12,7 @@ import cartRouter from './routes/cart.route.js';
 
 import { PORT } from './config/env.js';
 import connectToDB from './config/db.js';
-import connectCloudniray from './config/cloudinary.js';
+import { connectCloudniray } from './config/cloudinary.js';
 
 const app = express();
 const port = PORT || 4000;
@@ -21,6 +21,7 @@ await connectCloudniray();
 
 // Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(logger);
 app.use(cors);

@@ -34,12 +34,6 @@ export const productSchema = Joi.object({
       'number.min': 'Price must be positive number.',
     }),
 
-  images: Joi.array().items(Joi.string()).min(1).required()
-    .messages({
-      'array.min': 'Images must contain at least 1 image.',
-      'any.required': 'Images is required.'
-    }),
-
   sizes: Joi.array().items(sizeSchema).required().min(1)
     .messages({
       'array.min': 'You must provide at least 1 size option.',
@@ -65,7 +59,7 @@ export const productSchema = Joi.object({
       'any.required': 'Category is required.'
     }),
 
-  collectionName: Joi.string().allow('')
+  collectionName: Joi.string().optional()
     .messages({
       'string.empty': 'Collection can not be empty.',
     })

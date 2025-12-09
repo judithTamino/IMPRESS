@@ -60,8 +60,7 @@ const productSchema = new mongoose.Schema({
   collectionName: {
     type: String,
     lowercase: true,
-    trim: true,
-    default: ''
+    trim: true
   },
   isDeleted: {
     type: Boolean,
