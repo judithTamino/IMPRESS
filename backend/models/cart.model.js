@@ -1,6 +1,25 @@
 import mongoose from 'mongoose';
 import Item from './item.model.js';
 
+const cartItemsSchema = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+    required: true
+  },
+  size: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+    enum: ['xxs', 'xs', 's', 'm', 'l']
+  },
+  quantity: {
+    type: Number,
+    required: true, min: 1
+  },
+});
+
 const cartSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,7 +27,7 @@ const cartSchema = mongoose.Schema({
     required: true
   },
   items: {
-    type: [Item],
+    type: [cartItemsSchema],
     required: true
   },
   totalPrice: {
@@ -17,12 +36,12 @@ const cartSchema = mongoose.Schema({
   },
 }, { timestamps: true });
 
-cartSchema.methods.removeProductFromCart = function(productId, size) {
+cartSchema.methods.removeProductFromCart = function (productId, size) {
   return this.items.filter(
     item => !(item.product.toString() === productId && item.size === size));
 };
 
-cartSchema.methods.calculateTotal = function() {
+cartSchema.methods.calculateTotal = function () {
   return this.items.reduce((accumulator, item) => accumulator + item.price * item.quantity, 0);
 };
 
