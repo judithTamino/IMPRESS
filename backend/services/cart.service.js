@@ -2,6 +2,7 @@ import Cart from '../models/cart.model.js';
 import Product from "../models/product.model.js";
 
 import { CustomError } from '../utils/error.utils.js';
+import { addExpired, calculateTotal, findProductSize } from '../utils/cart.utils.js';
 
 export const getCart = async (user) => {
   let onSale = [], expired = [], totalPrice = 0;
@@ -13,68 +14,68 @@ export const getCart = async (user) => {
       totalPrice: 0
     };
 
+  const productsId = cart.items.map(item => item.product);
+  const products = await Product.find({ _id: { $in: productsId } });
+  const productsMap = new Map(products.map(product => [String(product._id), product]));
+
   for (const item of cart.items) {
-    const product = await Product.findById(item.product);
-    const cartItem = {
-      product: product._id,
-      name: product.name,
+    const product = productsMap.get(String(item.product));
+
+    const baseItem = {
+      product: item.product,
       size: item.size,
-      quantity: item.quantity,
-      price: product.price,
-      salePrice: product.salePrice ? product.salePrice : null,
-      image: product.images[0],
+      quantity: item.quantity
+    };
+
+    if (!product) {
+      addExpired(baseItem, 'discontinued', expired);
+      continue;
     }
 
-    if (!product)
-      continue;
+    const cartItem = {
+      ...baseItem,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice || null,
+      image: product.images?.[0],
+    }
 
     if (product.isDeleted) {
-      expired.push({
-        ...cartItem,
-        reason: 'no longer available'
-      });
+      addExpired(cartItem, 'discontinued', expired);
       continue;
     }
 
-    const productSize = product.sizes.find(s => s.size === item.size);
+    const productSize = findProductSize(product, item.size);
+
     if (!productSize) {
-      expired.push({
-        ...cartItem,
-        reason: 'size not available'
-      });
+      addExpired(cartItem, 'size not available', expired);
       continue;
     }
 
     const stock = productSize.stock;
+
     if (stock === 0) {
-      expired.push({
-        ...cartItem,
-        reason: 'out of stock'
-      });
+      addExpired(cartItem, 'out of stock', expired);
       continue;
     }
 
     if (stock < item.quantity) {
-      expired.push({
-        ...cartItem,
-        reason: 'partial stock'
-      });
+      addExpired(cartItem, 'partial stock', expired);
       continue;
     }
 
-    const price = product.salePrice || product.price;
+    // Product is valid & fully available
+    const finalPrice = product.salePrice || product.price;
 
     onSale.push(cartItem);
-    totalPrice += price * item.quantity
+    totalPrice += finalPrice * item.quantity;
   }
 
   const items = [...onSale];
-  if (expired > 0) items.push({ expired });
+  if (expired.length > 0)
+    items.push({ expired });
 
-  return {
-    items,
-    totalPrice
-  }
+  return { items, totalPrice };
 }
 
 export const addToCart = async (userId, productId, quantity, size) => {
@@ -82,4 +83,33 @@ export const addToCart = async (userId, productId, quantity, size) => {
 
   if (!product || product.isDeleted)
     throw new CustomError('Product not found', 404)
+
+  const outOfStock = findProductSize(product, size).stock === 0;
+
+  if (outOfStock)
+    throw new CustomError('out of stock', 400);
+
+  let cart = await Cart.findOne({ user: userId });
+
+  if (!cart) cart = new Cart({
+    user: userId,
+    items: [],
+    totalPrice: 0
+  });
+
+  const existingItem = cart.items.find(i => i.product.toString() === productId.toString())
+ 
+  if (existingItem)
+    existingItem.quantity += 1;
+  else
+    cart.items.push({
+      product: productId,
+      size,
+      quantity,
+    })
+
+  cart.totalPrice = await calculateTotal(cart.items);
+
+  await cart.save();
+  return cart;
 }

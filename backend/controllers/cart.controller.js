@@ -22,41 +22,13 @@ export const addToCart = asyncHandler(async (req, res) => {
   const productId = req.params.id;
   const { quantity, size } = req.body.items[0];
 
-  // const product = await Product.findById(productId);
-  // if (!product || product.isDeleted) {
-  //   const error = new Error('Product not available.');
-  //   error.statusCode = 404;
-  //   throw error;
-  // }
+  const cart = await cartService.addToCart(userId, productId, quantity, size);
 
-  // const isOutOfStock = product.sizes.find(s => s.size === size && s.stock === 0);
-  // if (isOutOfStock) {
-  //   const error = new Error(`${product.name} is out of stock.`);
-  //   error.statusCode = 400;
-  //   throw error;
-  // }
-
-  // let cart = await Cart.findOne({ user: userId });
-  // if (!cart) cart = new Cart({ user: userId, items: [] });
-
-  // const exsistingProduct = cart.items.find(item => item.product.toString() === productId && item.size === size);
-
-  // if (exsistingProduct) {
-  //   exsistingProduct.quantity = quantity;
-  // } else
-  //   cart.items.push({
-  //     product: productId,
-  //     name: product.name,
-  //     size,
-  //     quantity,
-  //     price: product.price,
-  //     image: product.images[0]
-  //   })
-
-  // cart.totalPrice = cart.calculateTotal();
-
-  // await cart.save();
-  // res.status(201).json({ msg: `${product.name} added to cart.`, cart: cart });
+  res.status(201).json({
+    success: true,
+    message: 'item added to catr.',
+    cart
+  });
 });
 
 
