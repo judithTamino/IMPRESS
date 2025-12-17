@@ -15,7 +15,8 @@ const cartItemsSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: true, min: 1
+    required: true, 
+    min: 1
   },
 }, { _id: false });
 
@@ -29,20 +30,8 @@ const cartSchema = mongoose.Schema({
     type: [cartItemsSchema],
     required: true
   },
-  totalPrice: {
-    type: Number,
-    default: 0
-  },
 }, { timestamps: true });
 
-cartSchema.methods.removeProductFromCart = function (productId, size) {
-  return this.items.filter(
-    item => !(item.product.toString() === productId && item.size === size));
-};
-
-cartSchema.methods.calculateTotal = function () {
-  return this.items.reduce((accumulator, item) => accumulator + item.price * item.quantity, 0);
-};
 
 const Cart = mongoose.model('Cart', cartSchema);
 export default Cart;

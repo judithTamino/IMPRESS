@@ -33,23 +33,19 @@ export const addToCart = asyncHandler(async (req, res) => {
 
 
 // @des    delete item from cart
-// @route  DELETE api/cart
+// @route  DELETE api/cart/:id
 // @access private
-export const removeAllFromCart = asyncHandler(async (req, res) => {
-  // const { productId, size } = req.body;
-  // const userId = req.user.id;
+export const removeFromCart = asyncHandler(async (req, res) => {
+  const { size } = req.body;
+  const userId = req.user.id;
+  const productId  = req.params.id;
 
-  // const cart = await Cart.findOne({ user: userId }).select('items totalPrice');
-  // if (!cart) {
-  //   const error = new Error('Cart empty.');
-  //   error.statusCode = 404;
-  //   throw error;
-  // }
+  const cart = await cartService.removeFromCart(userId, productId, size);
 
-  // cart.items = cart.removePriductFromCart(productId, size);
-  // cart.totalPrice = cart.calculateTotal();
-  // await cart.save();
-
-  // res.status(200).json({ msg: 'Product remove.', cart: cart });
+    res.status(200).json({
+    success: true,
+    message: 'item removed from cart.',
+    cart
+  });
 });
 
