@@ -9,6 +9,7 @@ import cors from './middlewares/cors.middleware.js';
 import authRouter from './routes/auth.route.js';
 import productRouter from './routes/product.route.js';
 import cartRouter from './routes/cart.route.js';
+import orderRouter from './routes/order.route.js';
 
 import { PORT } from './config/env.js';
 import connectToDB from './config/db.js';
@@ -30,6 +31,7 @@ app.use(cors);
 app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
+app.use('/api/orders', orderRouter);
 
 // Error middleware
 app.use(errorHandler);

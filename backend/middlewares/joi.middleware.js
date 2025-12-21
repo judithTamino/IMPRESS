@@ -6,6 +6,4 @@ export const validate = (schema) => async (req, _res, next) => {
   } catch (error) {
     next(error);
   }
-
-
 };

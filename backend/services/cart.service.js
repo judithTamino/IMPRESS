@@ -15,17 +15,12 @@ export const getCart = async (user) => {
   const products = await getProductsMap(cart.items);
   const { validItems, expired, totalPrice } = validateCartItems(cart.items, products);
 
-  const items = [
-    ...validItems.map(item => ({
-      ...item,
-      image: products.get(String(item.product)).images[0]
-    }))
-  ];
+  const items = [...validItems];
 
-   if (expired.length > 0)
-     items.push({ expired });
+  if (expired.length > 0)
+    items.push({ expired });
 
-   return { items, totalPrice };
+  return { items, totalPrice };
 }
 
 export const addToCart = async (userId, productId, quantity, size) => {

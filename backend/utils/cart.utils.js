@@ -23,21 +23,28 @@ export const validateCartItems = (cartItems, products) => {
         product: item.product,
         reason: 'discontinued'
       })
+      continue;
     }
 
     const productSize = findProductSize(product, item.size);
 
-    if (!productSize)
+    if (!productSize) {
       expired.push({
         product: item.product,
         reason: 'size not available'
       })
+      continue;
+    }
 
-    if (productSize.stock === 0 || productSize.stock < item.quantity)
+
+    if (productSize.stock === 0 || productSize.stock < item.quantity) {
       expired.push({
         product: item.product,
         reason: 'out of stock'
       })
+      continue;
+    }
+      
 
     const price = product.salePrice ?? product.price;
 
@@ -46,7 +53,8 @@ export const validateCartItems = (cartItems, products) => {
       name: product.name,
       price,
       size: item.size,
-      quantity: item.quantity
+      quantity: item.quantity,
+      image: product.images[0]
     });
 
     totalPrice += price * item.quantity;

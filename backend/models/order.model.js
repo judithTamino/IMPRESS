@@ -69,7 +69,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ['credit-card', 'paypal', 'google-pay'],
+    enum: ['stripe', 'paypal'],
   },
 
   isPaid: {
@@ -79,13 +79,17 @@ const orderSchema = new mongoose.Schema({
 
   stripSessionId: {
     type: String,
-    unique: true
   },
 
   paidAt: Date,
   shippedAt: Date,
   deliveredAt: Date
 }, { timestamps: true });
+
+orderSchema.index(
+  { stripSessionId: 1 },
+  { unique: true, partialFilterExpression: { stripSessionId: { $exists: true } } }
+);
 
 const Order = mongoose.model('Order', orderSchema);
 export default Order;
