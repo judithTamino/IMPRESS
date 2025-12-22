@@ -45,7 +45,6 @@ export const validateCartItems = (cartItems, products) => {
       continue;
     }
       
-
     const price = product.salePrice ?? product.price;
 
     validItems.push({
@@ -59,7 +58,7 @@ export const validateCartItems = (cartItems, products) => {
 
     totalPrice += price * item.quantity;
   }
-
+  
   return { validItems, expired, totalPrice };
 };
 

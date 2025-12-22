@@ -10,6 +10,7 @@ import authRouter from './routes/auth.route.js';
 import productRouter from './routes/product.route.js';
 import cartRouter from './routes/cart.route.js';
 import orderRouter from './routes/order.route.js';
+import paymentRouter from './routes/payment.route.js';
 
 import { PORT } from './config/env.js';
 import connectToDB from './config/db.js';
@@ -32,6 +33,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', orderRouter);
+app.use('/api/payments', paymentRouter);
 
 // Error middleware
 app.use(errorHandler);

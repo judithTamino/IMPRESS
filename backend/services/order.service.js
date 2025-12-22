@@ -32,6 +32,7 @@ export const createOrder = async (user, orderData) => {
 
 export const getMyOrders = async (user, orderQuery) => {
   const filter = orderFilter({ user }, orderQuery);
+  console.log(filter);
 
   return await Order.find(filter)
     .sort({ createdAt: -1 })
@@ -55,4 +56,33 @@ export const getAllOrders = async (orderQuery) => {
     .populate('user', 'firstName lastName')
     .sort({ createdAt: -1 })
     .select('_id address totalPrice status');
+};
+
+export const getSingleOrder = async (user, orderId) => {
+  const order = await Order.findById(orderId);
+
+  if (!order)
+    throw new CustomError('Order not found.', 404);
+
+  if (String(order.user) !== String(user._id) && user.role !== 'admin')
+    throw new CustomError('You are not authorized to view this user`s order info.', 403);
+
+  return order;
+}
+
+export const cancelOrder = async (user, orderId) => {
+  const order = await Order.findById(orderId);
+
+  if (!order)
+    throw new CustomError('Order not found.', 404);
+
+  if (String(order.user) !== String(user._id) && user.role !== 'admin')
+    throw new CustomError('You are not authorized to cancel this user`s order.', 403);
+
+  if (order.status !== 'pending')
+    throw new CustomError('Order cannot be cancelled at this stage.', 400);
+
+  order.status = 'cancelled';
+  await order.save();
+  return order;
 };

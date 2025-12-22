@@ -26,12 +26,9 @@ const getDateRange = (range) => {
 export const orderFilter = (filter, query) => {
   if (query.status)
     if (query.status === 'unpaid')
-      filter.isPaid = false;
-    else {
-      filter.isPaid = true;
-      filter.status = query.status;
-    }
-
+      filter.paymentStatus = query.status;
+    else filter.status = query.status;
+    
   if (query.date) {
     const range = getDateRange(query.date);
     if (range) filter.createdAt = range;

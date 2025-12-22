@@ -72,9 +72,10 @@ const orderSchema = new mongoose.Schema({
     enum: ['stripe', 'paypal'],
   },
 
-  isPaid: {
-    type: Boolean,
-    default: false
+  paymentStatus: {
+    type: String,
+    enum: ['unpaid', 'paid', 'refunded'],
+    default: 'unpaid'
   },
 
   stripSessionId: {

@@ -11,5 +11,8 @@ orderRouter.post('/', protectRoute, validate(orderSchema), order.createOrder);
 orderRouter.get('/', protectRoute, adminRoute, order.getAllOrders);
 orderRouter.get('/my', protectRoute, order.getUserOrders);
 
+orderRouter.get('/:id', protectRoute, order.getOrderById);
+orderRouter.patch('/:id/cancel', protectRoute, order.cancelOrder);
+
 
 export default orderRouter;

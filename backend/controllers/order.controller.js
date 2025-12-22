@@ -48,15 +48,35 @@ export const getAllOrders = asyncHandler(async (req, res) => {
 // @des    Get single order
 // @route  GET api/orders/:id
 // @access private
-export const getOrderById = asyncHandler(async (req, res) => { });
+export const getOrderById = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const user = req.user;
+
+  const order = await orderService.getSingleOrder(user, orderId);
+  res.status(200).json({
+    success: true,
+    message: 'Order retrieved successfully.',
+    order
+  });
+});
 
 // @des    Cancel order 
-// @route  GET api/orders/:id/cancel  
+// @route  PATCH api/orders/:id/cancel  
 // @access private
-export const cancelOrder = asyncHandler(async (req, res) => { });
+export const cancelOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const user = req.user;
+
+  const order = await orderService.cancelOrder(user, orderId);
+  res.status(200).json({
+    success: true,
+    message: 'Order cancelled successfully.',
+    order
+  });
+});
 
 // @des    Update order status
 // @route  PATCH api/orders/:id/status
-// @access private
+// @access admin
 export const updateOrderStatus = asyncHandler(async (req, res) => { });
 
